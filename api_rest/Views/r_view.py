@@ -17,7 +17,9 @@ def consulta():
 
 @rest_blueprint.route('/consulta2', methods=['POST'])
 def consulta2():
-    data = consulta_rest_mesa()
+    ##consulta_rest_mesa
+    print(request.data.decode('utf-8'))
+    data = consulta_rest_mesa(request.data.decode('utf-8'))
     response = jsonify(data)
     print(response)
     return response

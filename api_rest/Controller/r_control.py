@@ -6,11 +6,12 @@ from datetime import date, timedelta
 ##GTDOCRES - DOCU RES
 ##GTRESMDA - SGS
 ##GTCOSCOR - COS
+##AND CREATIONDATE > (CURRENT TIMESTAMP - 24000 HOURS)
 def consulta_rest(data):
-    endpoint = 'http://10.2.210.147/meaweb/services/INC_DASH'
+    endpoint = 'https://cdesk.bi.com.gt/meaweb/services/INC_DASH'
     group = json.loads(data).get('group', '')
     fechatope = date.today()
-    fechainicio = date.today() - timedelta(days=+1, weeks=+120)
+    fechainicio = date.today() - timedelta(days=+1)
     # Formatear las fechas como cadenas "YYYY-MM-DD"
     fecha_inicio_str = fechainicio.strftime("%Y-%m-%d")
     fecha_tope_str = fechatope.strftime("%Y-%m-%d")
@@ -24,7 +25,6 @@ def consulta_rest(data):
                     <max:WHERE> 
         STATUS IN ('CANCELLED','CLOSED','INPROG', 'QUEUED', 'CANCELLED', 'HISTEDIT', 'NEW', 'PENDING', 'SLAHOLD')            
         AND CREATEDBY IN (select respparty from persongroupteam  where persongroup = ''' + "'" +group + "'"  +''') 
-        AND CREATIONDATE > (CURRENT TIMESTAMP - 24000 HOURS)
         AND DATE(CREATIONDATE) BETWEEN ''' + "'" + fecha_inicio_str + "'"  + ''' AND ''' + "'" + fecha_tope_str + "'"  + '''
                     </max:WHERE>
                   </max:INC_DASHQuery>
