@@ -9,7 +9,7 @@ def consulta_rest_mesa(data):
     endpoint = 'https://cdesk.bi.com.gt/meaweb/services/INC_DASH'
     group = json.loads(data).get('group', '')
     fechatope = date.today()
-    fechainicio = date.today() - timedelta(days=+1)
+    fechainicio = date.today() - timedelta(days=+1, weeks=+1)
     # Formatear las fechas como cadenas "YYYY-MM-DD"
     fecha_inicio_str = fechainicio.strftime("%Y-%m-%d")
     fecha_tope_str = fechatope.strftime("%Y-%m-%d")
@@ -22,7 +22,7 @@ def consulta_rest_mesa(data):
                      <max:INC_DASHQuery>
                         <max:WHERE> 
             STATUS IN ('CANCELLED','CLOSED','INPROG', 'QUEUED', 'CANCELLED', 'HISTEDIT', 'NEW', 'PENDING', 'SLAHOLD')            
-            AND CREATEDBY IN (select respparty from persongroupteam  where persongroup = ''' + "'" + group + "'" + ''') 
+            AND CREATEDBY IN (select respparty from persongroupteam  where persongroup IN '''  + group  + ''') 
             AND DATE(CREATIONDATE) BETWEEN ''' + "'" + fecha_inicio_str + "'" + ''' AND ''' + "'" + fecha_tope_str + "'" + '''
                         </max:WHERE>
                       </max:INC_DASHQuery>
@@ -58,6 +58,7 @@ def consulta_rest_mesa(data):
 
     for incident in dataExtractedIncidents:
         try:
+            print(incident['PERSON']['DISPLAYNAME'])
             newIncident = {'APERTURADO_POR': '','CLOSED': 0, 'RESOLVED': 0, 'INPROG': 0, 'QUEUED': 0, 'CANCELLED': 0, 'HISTEDIT': 0, 'NEW': 0,
                      'PENDING': 0, 'SLAHOLD': 0}
             if len(incidents) > 0:
