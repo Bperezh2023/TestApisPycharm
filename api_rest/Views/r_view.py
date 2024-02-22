@@ -1,21 +1,21 @@
 
 
 from flask import Blueprint, jsonify, request
-from api_rest.Controller.r_control import consulta_rest
+from api_rest.Controller.r_control import consulta_grupos
 from api_rest.Controller.r_control_2 import consulta_rest_mesa
 
 rest_blueprint = Blueprint('rest', __name__)
 
-@rest_blueprint.route('/consulta', methods=['POST'])
+@rest_blueprint.route('/consulta-grupos', methods=['POST'])
 def consulta():
     print(request.data.decode('utf-8'))
-    data = consulta_rest(request.data.decode('utf-8'))
+    data = consulta_grupos(request.data.decode('utf-8'))
     response = jsonify(data)
     print(response)
     return response
 
 
-@rest_blueprint.route('/consulta2', methods=['POST'])
+@rest_blueprint.route('/consulta-mda', methods=['POST'])
 def consulta2():
     ##consulta_rest_mesa
     print(request.data.decode('utf-8'))

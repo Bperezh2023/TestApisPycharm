@@ -58,7 +58,6 @@ def consulta_rest_mesa(data):
 
     for incident in dataExtractedIncidents:
         try:
-            print(incident['PERSON']['DISPLAYNAME'])
             newIncident = {'APERTURADO_POR': '','CLOSED': 0, 'RESOLVED': 0, 'INPROG': 0, 'QUEUED': 0, 'CANCELLED': 0, 'HISTEDIT': 0, 'NEW': 0,
                      'PENDING': 0, 'SLAHOLD': 0}
             if len(incidents) > 0:

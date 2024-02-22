@@ -3,35 +3,35 @@ import xmltodict
 import json
 from datetime import date, timedelta
 
-##GTDOCRES - DOCU RES
-##GTRESMDA - SGS
-##GTCOSCOR - COS
-##AND CREATIONDATE > (CURRENT TIMESTAMP - 24000 HOURS)
-def consulta_rest(data):
+##AND CREATIONDATE > (CURRENT TIMESTAMP - 24000 HOURS)                             "OWNER": "22340",
+##AND DISPLAYNAME IN (SELECT DISPLAYNAME FROM PERSON WHERE PERSONID = 22340)
+def consulta_grupos(data):
     endpoint = 'https://cdesk.bi.com.gt/meaweb/services/INC_DASH'
     group = json.loads(data).get('group', '')
     fechatope = date.today()
-    fechainicio = date.today() - timedelta(days=+1)
+    fechainicio = date.today() - timedelta(days=+1, weeks=+1)
     # Formatear las fechas como cadenas "YYYY-MM-DD"
     fecha_inicio_str = fechainicio.strftime("%Y-%m-%d")
     fecha_tope_str = fechatope.strftime("%Y-%m-%d")
 
     consulta_xml = '''
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:max="http://www.ibm.com/maximo">
-           <soapenv:Header/>
-           <soapenv:Body>
-              <max:QueryINC_DASH>
-                 <max:INC_DASHQuery>
-                    <max:WHERE> 
-        STATUS IN ('CANCELLED','CLOSED','INPROG', 'QUEUED', 'CANCELLED', 'HISTEDIT', 'NEW', 'PENDING', 'SLAHOLD')            
-        AND CREATEDBY IN (select respparty from persongroupteam  where persongroup = ''' + "'" +group + "'"  +''') 
-        AND DATE(CREATIONDATE) BETWEEN ''' + "'" + fecha_inicio_str + "'"  + ''' AND ''' + "'" + fecha_tope_str + "'"  + '''
-                    </max:WHERE>
-                  </max:INC_DASHQuery>
-              </max:QueryINC_DASH>
-           </soapenv:Body>
-        </soapenv:Envelope>
-    '''
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:max="http://www.ibm.com/maximo">
+               <soapenv:Header/>
+               <soapenv:Body>
+                  <max:QueryINC_DASH>
+                     <max:INC_DASHQuery>
+                        <max:WHERE> 
+            STATUS IN ('CANCELLED','CLOSED','INPROG', 'QUEUED', 'CANCELLED', 'HISTEDIT', 'NEW', 'PENDING', 'SLAHOLD')            
+            AND OWNERGROUP IN '''  + group  + '''            
+            AND DATE(CREATIONDATE) BETWEEN ''' + "'" + fecha_inicio_str + "'" + ''' AND ''' + "'" + fecha_tope_str + "'" + '''
+                        </max:WHERE>
+                      </max:INC_DASHQuery>
+                  </max:QueryINC_DASH>
+               </soapenv:Body>
+            </soapenv:Envelope>
+        '''
+
+    print(consulta_xml)
     headers = {'Authorization': 'Basic bWF4YWRtaW46QmFuY28yMDIyLg=='}
 
     response = requests.post(endpoint, data=consulta_xml, headers=headers)
@@ -42,7 +42,8 @@ def consulta_rest(data):
 
     try:
         response_dict = xmltodict.parse(response.text)
-        dataExtractedIncidents = response_dict['soapenv:Envelope']['soapenv:Body']['QueryINC_DASHResponse']['INC_DASHSet']['INCIDENT']
+        dataExtractedIncidents = \
+        response_dict['soapenv:Envelope']['soapenv:Body']['QueryINC_DASHResponse']['INC_DASHSet']['INCIDENT']
     except KeyError:
         print("Error: Missing or incorrect key in response_dict.")
         return
@@ -50,14 +51,36 @@ def consulta_rest(data):
         print(f"Error parsing XML response: {e}")
         return
 
-    status_counts = {'CLOSED': 0, 'RESOLVED': 0, 'INPROG': 0, 'QUEUED': 0, 'CANCELLED': 0, 'HISTEDIT': 0, 'NEW': 0,
+
+    status_counts = {'ASIGNADO_A': '', 'INPROG': 0, 'QUEUED': 0, 'NEW': 0,
                      'PENDING': 0, 'SLAHOLD': 0}
+    incidents = []
+
+
 
     for incident in dataExtractedIncidents:
         try:
-            status = incident['STATUS']['@maxvalue']
-            if status in status_counts:
-                status_counts[status] += 1
+            print(incident['PERSONGROUP']['DESCRIPTION'])
+            print(incident['PERSON']['DISPLAYNAME'])
+            newIncident = {'ASIGNADO_A': '', 'INPROG': 0, 'QUEUED': 0, 'NEW': 0,
+                     'PENDING': 0, 'SLAHOLD': 0}
+            if len(incidents) > 0:
+                objFind = [x for x in incidents if x['ASIGNADO_A'] == incident['PERSONGROUP']['DESCRIPTION']]
+                if len(objFind) > 0:
+                    for obj in incidents:
+                        if obj['ASIGNADO_A'] == incident['PERSONGROUP']['DESCRIPTION']:
+                            if incident['STATUS']['@maxvalue'] in obj:
+                                obj[incident['STATUS']['@maxvalue']] += 1
+                else:
+                    newIncident['ASIGNADO_A'] = incident['PERSONGROUP']['DESCRIPTION']
+                    if incident['STATUS']['@maxvalue'] in newIncident:
+                        newIncident[incident['STATUS']['@maxvalue']] += 1
+                    incidents.append(newIncident)
+            else:
+                status_counts['ASIGNADO_A'] = incident['PERSONGROUP']['DESCRIPTION']
+                if incident['STATUS']['@maxvalue'] in status_counts:
+                    status_counts[incident['STATUS']['@maxvalue']] += 1
+                incidents.append(status_counts)
         except KeyError:
             print("Error: Missing or incorrect key in incident.")
             continue
@@ -65,9 +88,6 @@ def consulta_rest(data):
             print(f"Error processing incident: {e}")
             continue
 
-    jsonFormed = status_counts
-    print(jsonFormed)
+    ##consulta_rest()
 
-##consulta_rest()
-
-    return jsonFormed
+    return incidents
