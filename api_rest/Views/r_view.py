@@ -1,8 +1,8 @@
 
 
 from flask import Blueprint, jsonify, request
-from api_rest.Controller.r_control import consulta_grupos
-from api_rest.Controller.r_control_2 import consulta_rest_mesa
+from Controller.r_control import consulta_grupos
+from Controller.r_control_2 import consulta_rest_mesa
 
 rest_blueprint = Blueprint('rest', __name__)
 
