@@ -1,6 +1,0 @@
-__pycache__/
-*.py[cod]
-*$py.class
-api_rest/Views/__pycache__/
-api_rest/Controller/__pycache__/
-api_rest/Models/__pycache__/
