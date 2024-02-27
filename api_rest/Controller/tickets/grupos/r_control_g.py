@@ -60,8 +60,7 @@ def consulta_grupos(data):
 
     for incident in dataExtractedIncidents:
         try:
-            newIncident = {'ASIGNADO_A': '', 'INPROG': 0, 'QUEUED': 0, 'NEW': 0,
-                     'PENDING': 0, 'SLAHOLD': 0}
+            newIncident = {}
             if len(incidents) > 0:
                 objFind = [x for x in incidents if x['ASIGNADO_A'] == incident['PERSONGROUP']['DESCRIPTION']]
                 if len(objFind) > 0:
@@ -69,16 +68,21 @@ def consulta_grupos(data):
                         if obj['ASIGNADO_A'] == incident['PERSONGROUP']['DESCRIPTION']:
                             if incident['STATUS']['@maxvalue'] in obj:
                                 obj[incident['STATUS']['@maxvalue']] += 1
+                            else:
+                                obj[incident['STATUS']['@maxvalue']] = 0
+                                obj[incident['STATUS']['@maxvalue']] += 1
                 else:
                     newIncident['ASIGNADO_A'] = incident['PERSONGROUP']['DESCRIPTION']
-                    if incident['STATUS']['@maxvalue'] in newIncident:
+                    if incident['STATUS']['@maxvalue'] in status_counts:
+                        newIncident[incident['STATUS']['@maxvalue']] = 0
                         newIncident[incident['STATUS']['@maxvalue']] += 1
                     incidents.append(newIncident)
             else:
-                status_counts['ASIGNADO_A'] = incident['PERSONGROUP']['DESCRIPTION']
+                newIncident['ASIGNADO_A'] = incident['PERSONGROUP']['DESCRIPTION']
                 if incident['STATUS']['@maxvalue'] in status_counts:
-                    status_counts[incident['STATUS']['@maxvalue']] += 1
-                incidents.append(status_counts)
+                    newIncident[incident['STATUS']['@maxvalue']] = 0
+                    newIncident[incident['STATUS']['@maxvalue']] += 1
+                incidents.append(newIncident)
         except KeyError:
             print("Error: Missing or incorrect key in incident.")
             continue

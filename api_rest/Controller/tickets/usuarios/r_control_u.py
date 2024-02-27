@@ -59,8 +59,7 @@ def consulta_rest_mesa(data):
 
     for incident in dataExtractedIncidents:
         try:
-            newIncident = {'APERTURADO_POR': '','CLOSED': 0, 'RESOLVED': 0, 'INPROG': 0, 'QUEUED': 0, 'CANCELLED': 0, 'HISTEDIT': 0, 'NEW': 0,
-                     'PENDING': 0, 'SLAHOLD': 0}
+            newIncident = {}
             if len(incidents) > 0:
                 objFind = [x for x in incidents if x['APERTURADO_POR'] == incident['PERSON']['DISPLAYNAME']]
                 if len(objFind) > 0:
@@ -68,23 +67,29 @@ def consulta_rest_mesa(data):
                         if obj['APERTURADO_POR'] == incident['PERSON']['DISPLAYNAME']:
                             if incident['STATUS']['@maxvalue'] in obj:
                                 obj[incident['STATUS']['@maxvalue']] += 1
+                            else:
+                                obj[incident['STATUS']['@maxvalue']] = 0
+                                obj[incident['STATUS']['@maxvalue']] += 1
                 else:
                     newIncident['APERTURADO_POR'] = incident['PERSON']['DISPLAYNAME']
-                    if incident['STATUS']['@maxvalue'] in newIncident:
+                    if incident['STATUS']['@maxvalue'] in status_counts:
+                       
+                        newIncident[incident['STATUS']['@maxvalue']] = 0
                         newIncident[incident['STATUS']['@maxvalue']] += 1
                     incidents.append(newIncident)
             else:
-                status_counts['APERTURADO_POR'] = incident['PERSON']['DISPLAYNAME']
+                newIncident['APERTURADO_POR'] = incident['PERSON']['DISPLAYNAME']
                 if incident['STATUS']['@maxvalue'] in status_counts:
-                    status_counts[incident['STATUS']['@maxvalue']] += 1
-                incidents.append(status_counts)
+                    newIncident[incident['STATUS']['@maxvalue']] = 0
+                    newIncident[incident['STATUS']['@maxvalue']] += 1
+                incidents.append(newIncident)
         except KeyError:
             print("Error: Missing or incorrect key in incident.")
             continue
         except Exception as e:
             print(f"Error processing incident: {e}")
             continue
-
+        
     response = jsonify(incidents)
     response.status = 200
 
