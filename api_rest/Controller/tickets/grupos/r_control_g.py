@@ -66,11 +66,12 @@ def consulta_grupos(data):
                 if len(objFind) > 0:
                     for obj in incidents:
                         if obj['ASIGNADO_A'] == incident['PERSONGROUP']['DESCRIPTION']:
-                            if incident['STATUS']['@maxvalue'] in obj:
-                                obj[incident['STATUS']['@maxvalue']] += 1
-                            else:
-                                obj[incident['STATUS']['@maxvalue']] = 0
-                                obj[incident['STATUS']['@maxvalue']] += 1
+                            if incident['STATUS']['@maxvalue'] in status_counts:
+                                if incident['STATUS']['@maxvalue'] in obj:
+                                    obj[incident['STATUS']['@maxvalue']] += 1
+                                else:
+                                    obj[incident['STATUS']['@maxvalue']] = 0
+                                    obj[incident['STATUS']['@maxvalue']] += 1
                 else:
                     newIncident['ASIGNADO_A'] = incident['PERSONGROUP']['DESCRIPTION']
                     if incident['STATUS']['@maxvalue'] in status_counts:
