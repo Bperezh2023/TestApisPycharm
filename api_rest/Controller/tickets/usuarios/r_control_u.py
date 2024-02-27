@@ -73,7 +73,6 @@ def consulta_rest_mesa(data):
                 else:
                     newIncident['APERTURADO_POR'] = incident['PERSON']['DISPLAYNAME']
                     if incident['STATUS']['@maxvalue'] in status_counts:
-                       
                         newIncident[incident['STATUS']['@maxvalue']] = 0
                         newIncident[incident['STATUS']['@maxvalue']] += 1
                     incidents.append(newIncident)
