@@ -16,6 +16,6 @@ def consultaGrupos():
 @rest_blueprint.route('/consulta-usuarios', methods=['POST'])
 def consultaUsuarios():
     ##consulta_rest_mesa
-    print(request.data.decode('utf-8't))
+    print(request.data.decode('utf-8'))
     result = consulta_rest_mesa(request.data.decode('utf-8'))
     return result
