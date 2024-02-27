@@ -2,6 +2,7 @@ import requests
 import xmltodict
 import json
 from datetime import date, timedelta
+from flask import jsonify
 
 ##AND CREATIONDATE > (CURRENT TIMESTAMP - 24000 HOURS)                             "OWNER": "22340",
 ##AND DISPLAYNAME IN (SELECT DISPLAYNAME FROM PERSON WHERE PERSONID = 22340)
@@ -84,6 +85,7 @@ def consulta_rest_mesa(data):
             print(f"Error processing incident: {e}")
             continue
 
-    ##consulta_rest()
+    response = jsonify(incidents)
+    response.status = 200
 
-    return incidents
+    return response

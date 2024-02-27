@@ -2,6 +2,7 @@ import requests
 import xmltodict
 import json
 from datetime import date, timedelta
+from flask import jsonify
 
 ##AND CREATIONDATE > (CURRENT TIMESTAMP - 24000 HOURS)                             "OWNER": "22340",
 ##AND DISPLAYNAME IN (SELECT DISPLAYNAME FROM PERSON WHERE PERSONID = 22340)
@@ -30,8 +31,7 @@ def consulta_grupos(data):
                </soapenv:Body>
             </soapenv:Envelope>
         '''
-
-    print(consulta_xml)
+    
     headers = {'Authorization': 'Basic bWF4YWRtaW46QmFuY28yMDIyLg=='}
 
     response = requests.post(endpoint, data=consulta_xml, headers=headers)
@@ -60,8 +60,6 @@ def consulta_grupos(data):
 
     for incident in dataExtractedIncidents:
         try:
-            print(incident['PERSONGROUP']['DESCRIPTION'])
-            print(incident['PERSON']['DISPLAYNAME'])
             newIncident = {'ASIGNADO_A': '', 'INPROG': 0, 'QUEUED': 0, 'NEW': 0,
                      'PENDING': 0, 'SLAHOLD': 0}
             if len(incidents) > 0:
@@ -88,6 +86,8 @@ def consulta_grupos(data):
             print(f"Error processing incident: {e}")
             continue
 
-    ##consulta_rest()
 
-    return incidents
+    response = jsonify(incidents)
+    response.status = 200
+
+    return response
