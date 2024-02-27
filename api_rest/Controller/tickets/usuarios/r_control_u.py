@@ -51,10 +51,8 @@ def consulta_rest_mesa(data):
         return
 
 
-    status_counts = {'APERTURADO_POR': '','CLOSED': 0, 'RESOLVED': 0, 'INPROG': 0, 'QUEUED': 0, 'CANCELLED': 0, 'HISTEDIT': 0, 'NEW': 0,
-                     'PENDING': 0, 'SLAHOLD': 0}
+    status_counts = {'APERTURADO_POR': '','INPROG': 0, 'QUEUED': 0,  'RESOLVED': 0, 'CLOSED': 0, 'HISTEDIT': 0, 'SLAHOLD': 0}
     incidents = []
-
 
 
     for incident in dataExtractedIncidents:
