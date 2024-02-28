@@ -59,23 +59,27 @@ def consulta_rest_mesa(data):
         try:
             newIncident = {}
             if len(incidents) > 0:
-                objFind = [x for x in incidents if x['APERTURADO_POR'] == incident['PERSON']['DISPLAYNAME']]
+                nameOwnerOpened = incident['PERSON']['DISPLAYNAME'].split()
+                nameSearched = nameOwnerOpened[2] + ' ' + nameOwnerOpened[0]
+                objFind = [x for x in incidents if x['APERTURADO_POR'] == nameSearched] 
                 if len(objFind) > 0:
                     for obj in incidents:
-                        if obj['APERTURADO_POR'] == incident['PERSON']['DISPLAYNAME']:
+                        if obj['APERTURADO_POR'] == nameSearched:
                             if incident['STATUS']['@maxvalue'] in obj:
                                 obj[incident['STATUS']['@maxvalue']] += 1
                             else:
                                 obj[incident['STATUS']['@maxvalue']] = 0
                                 obj[incident['STATUS']['@maxvalue']] += 1
                 else:
-                    newIncident['APERTURADO_POR'] = incident['PERSON']['DISPLAYNAME']
+                    nameOwnerOpened = incident['PERSON']['DISPLAYNAME'].split()
+                    newIncident['APERTURADO_POR'] =   nameOwnerOpened[2] + ' ' + nameOwnerOpened[0]
                     if incident['STATUS']['@maxvalue'] in status_counts:
                         newIncident[incident['STATUS']['@maxvalue']] = 0
                         newIncident[incident['STATUS']['@maxvalue']] += 1
                     incidents.append(newIncident)
             else:
-                newIncident['APERTURADO_POR'] = incident['PERSON']['DISPLAYNAME']
+                nameOwnerOpened = incident['PERSON']['DISPLAYNAME'].split()
+                newIncident['APERTURADO_POR'] =   nameOwnerOpened[2] + ' ' + nameOwnerOpened[0]
                 if incident['STATUS']['@maxvalue'] in status_counts:
                     newIncident[incident['STATUS']['@maxvalue']] = 0
                     newIncident[incident['STATUS']['@maxvalue']] += 1
