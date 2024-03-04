@@ -8,7 +8,10 @@ from flask import jsonify
 ##AND DISPLAYNAME IN (SELECT DISPLAYNAME FROM PERSON WHERE PERSONID = 22340)
 def consulta_grupos(data):
     endpoint = 'https://cdesk.bi.com.gt/meaweb/services/INC_DASH'
+    
     group = json.loads(data).get('group', '')
+    otherStatus = json.loads(data).get('otherStatus', '') or False
+    
     fechatope = date.today()
     fechainicio = date.today() - timedelta(days=+1, weeks=+1)
     # Formatear las fechas como cadenas "YYYY-MM-DD"
@@ -52,8 +55,14 @@ def consulta_grupos(data):
         return
 
 
-    status_counts = {'ASIGNADO_A': '', 'INPROG': 0, 'QUEUED': 0, 'NEW': 0,
+    status_counts =  {}
+    
+    if(otherStatus == True):
+        status_counts = {'APERTURADO_POR': '','INPROG': 0, 'QUEUED': 0,  'RESOLVED': 0, 'CLOSED': 0, 'HISTEDIT': 0, 'SLAHOLD': 0}
+    else:
+        status_counts = {'ASIGNADO_A': '', 'INPROG': 0, 'QUEUED': 0, 'NEW': 0,
                      'PENDING': 0, 'SLAHOLD': 0}
+       
     incidents = []
 
 
