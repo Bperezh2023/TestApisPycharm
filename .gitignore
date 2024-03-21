@@ -1,1 +1,2 @@
 *.pyc
+api_rest/*/__pycache__
