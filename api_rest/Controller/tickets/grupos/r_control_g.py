@@ -9,8 +9,15 @@ from flask import jsonify
 def consulta_grupos(data):
     endpoint = 'https://cdesk.bi.com.gt/meaweb/services/INC_DASH'
     
-    group = json.loads(data).get('group', '')
-    otherStatus = json.loads(data).get('otherStatus', '') or False
+    body = json.loads(data)
+    group = body.get('group', '')
+    otherStatus = body.get('otherStatus', '') or False
+    groupCreated = ''
+    if(body.get('groupCreated', '')):
+        groupCreated = f'''AND CREATEDBY IN (select respparty from persongroupteam  where persongroup IN {body.get('groupCreated', '')})'''
+    else: 
+        groupCreated = ''
+
     
     fechatope = date.today()
     fechainicio = date.today() - timedelta(days=+1, weeks=+1)
@@ -18,7 +25,7 @@ def consulta_grupos(data):
     fecha_inicio_str = fechainicio.strftime("%Y-%m-%d")
     fecha_tope_str = fechatope.strftime("%Y-%m-%d")
 
-    consulta_xml = '''
+    consulta_xml = f'''
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:max="http://www.ibm.com/maximo">
                <soapenv:Header/>
                <soapenv:Body>
@@ -26,8 +33,9 @@ def consulta_grupos(data):
                      <max:INC_DASHQuery>
                         <max:WHERE> 
             STATUS IN ('CANCELLED','CLOSED','INPROG', 'QUEUED', 'CANCELLED', 'HISTEDIT', 'NEW', 'PENDING', 'SLAHOLD',  'RESOLVED')            
-            AND OWNERGROUP IN '''  + group  + '''            
-            AND DATE(CREATIONDATE) BETWEEN ''' + "'" + fecha_inicio_str + "'" + ''' AND ''' + "'" + fecha_tope_str + "'" + '''
+            AND OWNERGROUP IN {group}
+            {groupCreated}
+            AND DATE(CREATIONDATE) BETWEEN '{fecha_inicio_str }' AND '{fecha_tope_str}'
                         </max:WHERE>
                       </max:INC_DASHQuery>
                   </max:QueryINC_DASH>

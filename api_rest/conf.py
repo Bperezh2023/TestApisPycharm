@@ -1,1 +1,1 @@
-host = '172.17.195.6'
+host = 'localhost'
